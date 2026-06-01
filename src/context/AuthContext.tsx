@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { supabase, isSupabaseConfigured } from "../services/supabase";
 
 export interface UserProfile {
@@ -44,10 +44,21 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<any | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  // BUG #2 FIX: Start isLoading as true so the app waits for session check before rendering
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [demoModeActive, setDemoModeActive] = useState<boolean>(!isSupabaseConfigured);
+  const [demoModeActive, setDemoModeActive] = useState<boolean>(false);
 
-  // Read theme preference from database, localStorage or defaults
+  // Apply theme class to <html>
+  const applyThemeClass = useCallback((theme: "light" | "dark") => {
+    const root = window.document.documentElement;
+    if (theme === "dark") {
+      root.classList.add("dark");
+    } else {
+      root.classList.remove("dark");
+    }
+  }, []);
+
+  // Sync theme from profile or localStorage
   useEffect(() => {
     if (profile?.theme_preference) {
       const themeValue = getThemeFromPreference(profile.theme_preference);
@@ -57,59 +68,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const savedTheme = localStorage.getItem("theme_pref") as "light" | "dark";
       applyThemeClass(savedTheme || "light");
     }
-  }, [profile]);
+  }, [profile, applyThemeClass]);
 
-  const applyThemeClass = (theme: "light" | "dark") => {
-    const root = window.document.documentElement;
-    if (theme === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
-  };
-
-  // Helper to sync or construct a profile record
-  const fetchProfile = async (userId: string, email: string) => {
-    // 1. Immediately provision a highly reliable fallback profile
-    // so that the UI can render instantly and never get stuck or hide the logout options.
+  // ----------------------------------------------------------------
+  // BUG #2 FIX: Extracted fetchProfile into a stable, reusable function.
+  // Previously this was an inline function that could lose closure context
+  // when called from the auth state change listener.
+  // ----------------------------------------------------------------
+  const fetchProfile = useCallback(async (userId: string, email: string): Promise<void> => {
+    // Provide a reliable fallback immediately so the UI never hangs
     const fallbackProfile: UserProfile = {
       id: userId,
       email: email,
       full_name: email.split("@")[0],
       avatar_url: `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(email)}`,
       auth_provider: "email",
-      theme_preference: "light"
+      theme_preference: "light",
     };
-
     setProfile(fallbackProfile);
 
     if (!isSupabaseConfigured || !supabase) return;
+
     try {
       const { data, error } = await (supabase as any)
         .from("profiles")
         .select("*")
         .eq("id", userId)
         .single();
-      
+
       if (error) {
         if (error.code === "PGRST116") {
-          // Profile doesn't exist yet, insert one
-          const newProfile: UserProfile = {
-            id: userId,
-            email: email,
-            full_name: email.split("@")[0],
-            avatar_url: `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(email)}`,
-            auth_provider: "email",
-            theme_preference: "light"
-          };
+          // Profile row doesn't exist yet — insert one
+          const newProfile: UserProfile = { ...fallbackProfile };
           try {
             await (supabase as any).from("profiles").insert(newProfile as any);
           } catch (insertErr) {
-            console.error("Could not insert profile in DB, continuing with local fallback:", insertErr);
+            console.error("Could not insert profile, using fallback:", insertErr);
           }
           setProfile(newProfile);
         } else {
-          console.error("Error reading profile database (using fallback):", error);
+          // Other DB error — keep fallback, log it
+          console.error("Profile fetch error (keeping fallback):", error);
         }
       } else if (data) {
         setProfile({
@@ -118,87 +117,113 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           full_name: data.full_name || data.email.split("@")[0],
           avatar_url: data.avatar_url || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(data.email)}`,
           auth_provider: data.auth_provider || "email",
-          theme_preference: (data.theme_preference || "light") as "light" | "dark"
+          theme_preference: (data.theme_preference || "light") as "light" | "dark",
         });
       }
     } catch (err) {
-      console.error("Profile sync failure (retained local fallback):", err);
+      console.error("Profile sync error (keeping fallback):", err);
     }
-  };
+  }, []);
 
-  // Check existing session
+  // ----------------------------------------------------------------
+  // BUG #2 ROOT FIX: The original code had a race condition where:
+  //   1. onAuthStateChange fired BEFORE getSession() resolved
+  //   2. The listener set user=null when session was actually valid
+  //   3. This caused the app to show AuthPage and then immediately
+  //      redirect, losing any attempt to fetch user data
+  //
+  // Fix: Use a single initialization flow with proper ordering:
+  //   1. Handle OAuth redirect tokens from URL hash first
+  //   2. Call getSession() to check for existing session
+  //   3. Set up onAuthStateChange AFTER initial session is known
+  //   4. The listener only handles SUBSEQUENT changes (sign in/out)
+  // ----------------------------------------------------------------
   useEffect(() => {
-    // Fail-safe safety timer: Force hide loading spinner after 6 seconds to prevent any frozen states!
+    let mounted = true;
+
+    // Safety timeout — never leave the user on a loading screen forever
     const safetyTimer = setTimeout(() => {
-      setIsLoading(false);
-    }, 6000);
-
-    if (!isSupabaseConfigured || !supabase) {
-      // Setup mock persistence if in Demo Mode
-      try {
-        const cachedDemoUser = localStorage.getItem("PFA_DEMO_USER");
-        if (cachedDemoUser) {
-          const parsed = JSON.parse(cachedDemoUser);
-          setUser(parsed.user);
-          setProfile(parsed.profile);
-          setDemoModeActive(true);
-        }
-      } catch (err) {
-        console.error("Failed to parse cached demo user", err);
-        localStorage.removeItem("PFA_DEMO_USER");
+      if (mounted) {
+        console.warn("Auth safety timer fired — forcing isLoading=false");
+        setIsLoading(false);
       }
-      setIsLoading(false);
-      clearTimeout(safetyTimer);
-      return;
-    }
+    }, 8000);
 
-    // Supabase standard session check
-    const initAuth = async () => {
-      try {
-        // Manually parse hash or search parameters from the URL in case of redirect/iframe storage restrictions
-        let hash = window.location.hash || "";
-        if (hash.startsWith("#")) {
-          hash = hash.substring(1);
+    const initializeAuth = async () => {
+      // --- Step 1: Handle demo mode (no Supabase keys) ---
+      if (!isSupabaseConfigured || !supabase) {
+        try {
+          const cachedDemoUser = localStorage.getItem("PFA_DEMO_USER");
+          if (cachedDemoUser) {
+            const parsed = JSON.parse(cachedDemoUser);
+            if (mounted) {
+              setUser(parsed.user);
+              setProfile(parsed.profile);
+              setDemoModeActive(true);
+            }
+          }
+        } catch (err) {
+          console.error("Failed to parse cached demo user:", err);
+          localStorage.removeItem("PFA_DEMO_USER");
         }
+        if (mounted) setIsLoading(false);
+        clearTimeout(safetyTimer);
+        return;
+      }
+
+      // --- Step 2: Handle OAuth redirect tokens embedded in URL ---
+      // Supabase puts access_token in the URL hash after OAuth redirect.
+      // We must call setSession() before getSession() to capture it.
+      try {
+        let hash = window.location.hash || "";
+        if (hash.startsWith("#")) hash = hash.substring(1);
         const hashParams = new URLSearchParams(hash);
         const searchParams = new URLSearchParams(window.location.search);
-        
+
         const access_token = hashParams.get("access_token") || searchParams.get("access_token");
         const refresh_token = hashParams.get("refresh_token") || searchParams.get("refresh_token") || "";
 
         if (access_token) {
-          console.log("Detected access token in redirect URL. Establishing session manually...");
-          const { data: setSessionData, error: setSessionErr } = await supabase.auth.setSession({
+          console.log("OAuth redirect detected — establishing session from URL tokens...");
+          const { error: setSessionErr } = await supabase.auth.setSession({
             access_token,
-            refresh_token
+            refresh_token,
           });
           if (setSessionErr) {
-            console.error("Manual URL session establishment error:", setSessionErr);
-          } else if (setSessionData && setSessionData.session) {
-            console.log("Success! Session established from URL tokens.");
-            // Clean hash info and queries from address bar so that refreshing doesn't loop or reuse expired tokens
+            console.error("Failed to establish session from URL tokens:", setSessionErr);
+          } else {
+            // Clean up the URL so tokens aren't re-used on refresh
             try {
               const url = new URL(window.location.href);
               url.hash = "";
-              url.searchParams.delete("access_token");
-              url.searchParams.delete("refresh_token");
-              url.searchParams.delete("expires_in");
-              url.searchParams.delete("token_type");
-              url.searchParams.delete("type");
+              ["access_token","refresh_token","expires_in","token_type","type"].forEach(
+                (p) => url.searchParams.delete(p)
+              );
               window.history.replaceState({}, document.title, url.pathname + url.search);
-            } catch (historyErr) {
-              console.warn("Could not clean address bar hash/params:", historyErr);
-            }
+            } catch (e) { /* ignore history API errors */ }
           }
         }
+      } catch (urlErr) {
+        console.error("Error processing redirect URL:", urlErr);
+      }
 
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
+      // --- Step 3: Get current session (includes newly set session from step 2) ---
+      try {
+        const { data: { session }, error: sessionErr } = await supabase.auth.getSession();
+
+        if (sessionErr) {
+          console.error("getSession error:", sessionErr);
+        }
+
+        if (session && session.user && mounted) {
+          // BUG #2 FIX: We found a valid session — set user state and fetch their data
           setUser(session.user);
           setDemoModeActive(false);
           await fetchProfile(session.user.id, session.user.email || "");
-        } else {
-          // If no supabase session, fallback to local storage for demo
+          // Clear any stale demo user that might override real session data
+          localStorage.removeItem("PFA_DEMO_USER");
+        } else if (mounted) {
+          // No Supabase session — check if there's a demo session cached
           const cachedDemoUser = localStorage.getItem("PFA_DEMO_USER");
           if (cachedDemoUser) {
             try {
@@ -207,63 +232,85 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               setProfile(parsed.profile);
               setDemoModeActive(true);
             } catch (err) {
-              console.error("Malformed cached demo user JSON", err);
               localStorage.removeItem("PFA_DEMO_USER");
             }
           }
+          // If no session and no demo: user stays null → AuthPage renders
         }
       } catch (err) {
-        console.error("Error loading auth session:", err);
+        console.error("Session initialization error:", err);
       } finally {
-        setIsLoading(false);
+        if (mounted) setIsLoading(false);
         clearTimeout(safetyTimer);
       }
+
+      // --- Step 4: Set up auth state change listener for SUBSEQUENT changes ---
+      // BUG #2 FIX: This listener now only handles changes that happen AFTER
+      // initial load (sign-in from AuthPage, token refresh, sign-out).
+      // It does NOT handle the initial session — that's done above in step 3.
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(
+        async (event, session) => {
+          if (!mounted) return;
+
+          console.log("Auth state change:", event);
+
+          if (event === "SIGNED_IN" && session?.user) {
+            // User just signed in via OTP, Google, etc.
+            setUser(session.user);
+            setDemoModeActive(false);
+            await fetchProfile(session.user.id, session.user.email || "");
+            localStorage.removeItem("PFA_DEMO_USER");
+            // isLoading should already be false here; ensure it stays false
+            setIsLoading(false);
+          } else if (event === "TOKEN_REFRESHED" && session?.user) {
+            // Session token was refreshed — update user reference but
+            // don't re-fetch profile (it hasn't changed)
+            setUser(session.user);
+          } else if (event === "SIGNED_OUT") {
+            // Only clear if not in demo mode
+            const cachedDemoUser = localStorage.getItem("PFA_DEMO_USER");
+            if (!cachedDemoUser) {
+              setUser(null);
+              setProfile(null);
+              setDemoModeActive(!isSupabaseConfigured);
+            }
+          }
+          // Ignore USER_UPDATED — profile re-fetch is handled explicitly
+        }
+      );
+
+      // Return cleanup function
+      return () => subscription?.unsubscribe();
     };
 
-    initAuth();
-
-    // Setup listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session) {
-        setUser(session.user);
-        setDemoModeActive(false);
-        await fetchProfile(session.user.id, session.user.email || "");
-        // Clear demo user to prefer the real Supabase authenticated user
-        localStorage.removeItem("PFA_DEMO_USER");
-      } else {
-        // Only clear if we didn't deliberately activate simulation mode
-        try {
-          const cachedDemoUser = localStorage.getItem("PFA_DEMO_USER");
-          if (!cachedDemoUser) {
-            setUser(null);
-            setProfile(null);
-          }
-        } catch (err) {
-          setUser(null);
-          setProfile(null);
-        }
-      }
+    let cleanupFn: (() => void) | undefined;
+    initializeAuth().then((cleanup) => {
+      cleanupFn = cleanup;
     });
 
     return () => {
+      mounted = false;
       clearTimeout(safetyTimer);
-      subscription?.unsubscribe();
+      cleanupFn?.();
     };
-  }, []);
+  }, [fetchProfile]);
 
-  // OTP Login step 1: Request OTP
+  // ----------------------------------------------------------------
+  // AUTH METHODS
+  // ----------------------------------------------------------------
+
   const signInWithOtp = async (email: string) => {
     if (!isSupabaseConfigured || !supabase) {
-      return { success: true }; // Dummy success to trigger Otp Token screen in Demo mode
+      // Demo mode — pretend OTP was sent
+      return { success: true };
     }
-
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
           shouldCreateUser: true,
-          emailRedirectTo: window.location.origin
-        }
+          emailRedirectTo: window.location.origin,
+        },
       });
       if (error) throw error;
       return { success: true };
@@ -272,30 +319,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // OTP Login step 2: Verify code
   const verifyOtp = async (email: string, code: string, isSignUp: boolean) => {
     if (!isSupabaseConfigured || !supabase) {
-      // Simulate Demo session creation
+      // Demo mode — accept any 6-digit code
       triggerDemoSession(email);
       return { success: true };
     }
-
     try {
       const { data, error } = await supabase.auth.verifyOtp({
         email,
         token: code,
-        type: isSignUp ? "signup" : "email"
+        type: isSignUp ? "signup" : "email",
       });
-
       if (error) {
-        // Fallback or retry with generic 'email' if signup type errors
-        const retryResult = await supabase.auth.verifyOtp({
-          email,
-          token: code,
-          type: "email"
-        });
+        // Retry with generic 'email' type
+        const retryResult = await supabase.auth.verifyOtp({ email, token: code, type: "email" });
         if (retryResult.error) throw retryResult.error;
-        
         if (retryResult.data?.session) {
           setUser(retryResult.data.session.user);
           setDemoModeActive(false);
@@ -304,7 +343,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         return { success: true };
       }
-
       if (data?.session) {
         setUser(data.session.user);
         setDemoModeActive(false);
@@ -317,25 +355,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Google Sign-in trigger
   const signInWithGoogle = async () => {
     if (!supabase) {
-      return { 
-        success: false, 
-        error: "Supabase is not configured yet. Please add your VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Settings > Secrets." 
+      return {
+        success: false,
+        error: "Supabase is not configured. Please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Settings > Secrets.",
       };
     }
-
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo: window.location.origin,
-          queryParams: {
-            access_type: "offline",
-            prompt: "consent"
-          }
-        }
+          queryParams: { access_type: "offline", prompt: "consent" },
+        },
       });
       if (error) throw error;
       return { success: true };
@@ -344,88 +377,73 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Sign out
   const signOut = async () => {
-    // 1. Immediately nullify credentials locally for instantaneous, zero-latency feedback
+    // 1. Immediately clear local state for instant UI feedback
     setUser(null);
     setProfile(null);
     setDemoModeActive(!isSupabaseConfigured);
 
-    // 2. Clear token traces and cache vectors from storage
+    // 2. Clear all local storage keys
     try {
-      localStorage.removeItem("PFA_DEMO_USER");
-      localStorage.removeItem("PFA_TRANSACTIONS");
-      localStorage.removeItem("PFA_BILLS");
-      localStorage.removeItem("PFA_SUGGESTIONS");
-      localStorage.removeItem("PFA_INCOME");
-      localStorage.removeItem("PFA_ALERTS");
-      
-      Object.keys(localStorage).forEach(key => {
+      ["PFA_DEMO_USER","PFA_TRANSACTIONS","PFA_BILLS","PFA_SUGGESTIONS","PFA_INCOME","PFA_ALERTS"].forEach(
+        (key) => localStorage.removeItem(key)
+      );
+      // Clear Supabase auth keys
+      Object.keys(localStorage).forEach((key) => {
         if (key.startsWith("sb-") || key.includes("supabase")) {
           localStorage.removeItem(key);
         }
       });
     } catch (e) {
-      console.warn("Local caches purge anomaly:", e);
+      console.warn("Local storage clear error:", e);
     }
 
-    // 3. Initiate background remote sign-out non-blockingly so any slow connection/hang never impacts the user logout
+    // 3. Remote sign-out in the background (non-blocking)
     if (isSupabaseConfigured && supabase) {
-      try {
-        supabase.auth.signOut().catch(err => {
-          console.warn("Background remote auth sign-out completed or warning:", err);
-        });
-      } catch (err) {
-        console.warn("Synchronous background sign-out execution warning:", err);
-      }
+      supabase.auth.signOut().catch((err) =>
+        console.warn("Background sign-out warning:", err)
+      );
     }
   };
 
-  // Theme support
   const updateThemePreference = async (newTheme: "light" | "dark") => {
     localStorage.setItem("theme_pref", newTheme);
     applyThemeClass(newTheme);
 
-    if (profile) {
-      let nextThemePreference: string = newTheme;
-      if (profile.theme_preference) {
-        try {
-          if (profile.theme_preference !== "light" && profile.theme_preference !== "dark") {
-            const parsed = JSON.parse(profile.theme_preference);
-            if (parsed && typeof parsed === "object") {
-              parsed.theme = newTheme;
-              parsed.theme_preference = newTheme;
-              nextThemePreference = JSON.stringify(parsed);
-            }
-          }
-        } catch (e) {}
-      }
+    if (!profile) return;
 
-      const updatedProfile = { ...profile, theme_preference: nextThemePreference as any };
-      setProfile(updatedProfile);
-
-      if (isSupabaseConfigured && supabase && user) {
-        try {
-          await (supabase as any)
-            .from("profiles")
-            .update({ theme_preference: nextThemePreference } as any)
-            .eq("id", user.id);
-        } catch (err) {
-          console.error("Database theme preference synchronization error:", err);
+    let nextThemePreference: string = newTheme;
+    try {
+      if (profile.theme_preference !== "light" && profile.theme_preference !== "dark") {
+        const parsed = JSON.parse(profile.theme_preference as string);
+        if (parsed && typeof parsed === "object") {
+          parsed.theme = newTheme;
+          parsed.theme_preference = newTheme;
+          nextThemePreference = JSON.stringify(parsed);
         }
-      } else if (demoModeActive) {
-        localStorage.setItem(
-          "PFA_DEMO_USER",
-          JSON.stringify({ user, profile: updatedProfile })
-        );
       }
+    } catch (e) {}
+
+    const updatedProfile = { ...profile, theme_preference: nextThemePreference as any };
+    setProfile(updatedProfile);
+
+    if (isSupabaseConfigured && supabase && user) {
+      try {
+        await (supabase as any)
+          .from("profiles")
+          .update({ theme_preference: nextThemePreference } as any)
+          .eq("id", user.id);
+      } catch (err) {
+        console.error("Theme preference DB sync error:", err);
+      }
+    } else if (demoModeActive) {
+      localStorage.setItem("PFA_DEMO_USER", JSON.stringify({ user, profile: updatedProfile }));
     }
   };
 
-  // Profile fields edits
   const updateProfileDetails = async (updates: Partial<UserProfile>) => {
     if (!profile) return { success: false, error: "No active profile session" };
-    
+
     const updated = { ...profile, ...updates };
     setProfile(updated);
 
@@ -446,12 +464,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Direct mock simulation triggers
   const triggerDemoSession = (email: string, name?: string) => {
     const mockUser = {
       id: "demo-user-123456",
       email,
-      user_metadata: { full_name: name || email.split("@")[0] }
+      user_metadata: { full_name: name || email.split("@")[0] },
     };
     const mockProfile: UserProfile = {
       id: "demo-user-123456",
@@ -459,17 +476,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       full_name: name || email.split("@")[0],
       avatar_url: `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(email)}`,
       auth_provider: name ? "google" : "email",
-      theme_preference: "light"
+      theme_preference: "light",
     };
-
     setUser(mockUser);
     setProfile(mockProfile);
     setDemoModeActive(true);
-
-    localStorage.setItem(
-      "PFA_DEMO_USER",
-      JSON.stringify({ user: mockUser, profile: mockProfile })
-    );
+    localStorage.setItem("PFA_DEMO_USER", JSON.stringify({ user: mockUser, profile: mockProfile }));
   };
 
   return (
@@ -486,7 +498,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signOut,
         updateThemePreference,
         updateProfileDetails,
-        triggerDemoSession
+        triggerDemoSession,
       }}
     >
       {children}

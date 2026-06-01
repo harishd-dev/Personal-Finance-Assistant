@@ -1,0 +1,6 @@
+{
+  "name": "Personal Finance Assistant",
+  "description": "AI-powered personal finance tracker with receipt OCR scanning, recurring bill optimization, interactive budget breakdowns, and monthly financial summaries.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

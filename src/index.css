@@ -1,0 +1,393 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@500;700;850&family=Fira+Code:wght@400;600&display=swap');
+@import "tailwindcss";
+
+/* 1. Define Tailwind v4 Custom Dark Variant for Class-based toggling */
+@variant dark (.dark &);
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", sans-serif;
+  --font-mono: "Fira Code", ui-monospace, SFMono-Regular, monospace;
+}
+
+/* Premium smooth light modern visual base */
+body {
+  background-color: #f8fafc !important; /* ultra soft medical slate grey */
+  color: #0f172a !important; /* deep charcoal slate */
+  font-family: var(--font-sans);
+  background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-opacity: 0.15;
+}
+
+/* 2. Premium Class-based Dark Mode rules for Base Elements and CSS classes */
+.dark body {
+  background-color: #0e131f !important; /* gorgeous space dark shade */
+  color: #f1f5f9 !important;
+  background-image: radial-gradient(#1e293b 1.2px, transparent 1.2px) !important;
+}
+
+.dark .min-h-screen.bg-slate-50\/50,
+.dark .min-h-screen.bg-slate-50 {
+  background-color: #080c14 !important;
+}
+
+.dark .bg-slate-50,
+.dark .bg-slate-50\/50,
+.dark .bg-slate-100,
+.dark .bg-slate-100\/50,
+.dark .bg-slate-50\/30 {
+  background-color: #162032 !important;
+}
+
+/* High contrast white cards transition to slate-900 in dark mode */
+.dark .bg-white,
+.dark .bg-white\/95,
+.dark .bg-white\/85 {
+  background-color: #0f1726 !important;
+}
+
+/* Border lines override */
+.dark .border-slate-150,
+.dark .border-slate-100,
+.dark .border-slate-200,
+.dark .border-slate-250,
+.dark .border-slate-200\/60,
+.dark .border-slate-200\/80,
+.dark .border-cyan-100,
+.dark .divide-slate-150,
+.dark .divide-slate-100 {
+  border-color: #1e293b !important;
+  border-opacity: 0.8 !important;
+}
+
+/* Specific text color conversions to preserve legible contrast ratios */
+.dark .text-slate-800 {
+  color: #f1f5f9 !important;
+}
+.dark .text-slate-850 {
+  color: #f1f5f9 !important;
+}
+.dark .text-slate-700 {
+  color: #cbd5e1 !important;
+}
+.dark .text-slate-650 {
+  color: #94a3b8 !important;
+}
+.dark .text-slate-600 {
+  color: #94a3b8 !important;
+}
+.dark .text-slate-550 {
+  color: #cbd5e1 !important;
+}
+.dark .text-slate-500 {
+  color: #94a3b8 !important;
+}
+.dark .text-slate-400 {
+  color: #64748b !important;
+}
+.dark .text-slate-900 {
+  color: #ffffff !important;
+}
+
+/* Brutal Card & layout dark styling overrides */
+.dark .brutal-card {
+  background-color: #0f1726 !important;
+  border: 1px solid #1e293b !important;
+  color: #f1f5f9 !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.45) !important;
+}
+.dark .brutal-card:hover {
+  border-color: #334155 !important;
+  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.6) !important;
+}
+
+.dark .brutal-card-subtle {
+  background-color: #162032 !important;
+  border: 1px solid #1e293b !important;
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark .brutal-input {
+  background-color: #121a2a !important;
+  color: #f1f5f9 !important;
+  border-color: #1e293b !important;
+}
+.dark select,
+.dark option {
+  background-color: #121a2a !important;
+  color: #f1f5f9 !important;
+}
+.dark .brutal-input:focus {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.25) !important;
+}
+
+.dark .brutal-btn-secondary {
+  background-color: #111a2e !important;
+  color: #e2e8f0 !important;
+  border-color: #1e293b !important;
+}
+.dark .brutal-btn-secondary:hover {
+  background-color: #16223d !important;
+  border-color: #334155 !important;
+  color: #ffffff !important;
+}
+
+.dark .brutal-header {
+  color: #ffffff !important;
+}
+
+.dark .brutal-badge {
+  background-color: #121a2c !important;
+  color: #94a3b8 !important;
+  border-color: #1e293b !important;
+}
+
+/* Toggle lists navigation and other layout items */
+.dark .bg-slate-100 {
+  background-color: #162032 !important;
+}
+
+.dark .hover\:bg-slate-50:hover {
+  background-color: #162032 !important;
+}
+
+.dark .text-slate-650 {
+  color: #94a3b8 !important;
+}
+
+.dark .brutal-ticker-footer {
+  background-color: #080c14 !important;
+  border-color: #111a2e !important;
+}
+
+/* Redefining brutal- borders to beautiful soft margins */
+.brutal-border {
+  border: 1px solid #e2e8f0 !important;
+}
+
+.brutal-border-subtle {
+  border: 1px solid #f1f5f9 !important;
+}
+
+/* Overriding old brutalist utilities into beautiful fluid layouts */
+.brutal-card {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  box-shadow: 0 4px 24px -2px rgba(15, 23, 42, 0.03), 0 2px 8px -1px rgba(0, 0, 0, 0.01) !important;
+  border-radius: 1rem !important; /* beautifully rounded 16px */
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.brutal-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px -4px rgba(15, 23, 42, 0.06), 0 4px 12px -2px rgba(0, 0, 0, 0.02) !important;
+}
+
+.brutal-card-subtle {
+  background-color: #ffffff !important;
+  border: 1px solid #f1f5f9 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+  border-radius: 0.75rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.brutal-btn-primary {
+  background-color: #4f46e5 !important; /* beautiful classic Indigo */
+  color: #ffffff !important;
+  border: 1px solid #4338ca !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  padding: 0.625rem 1.25rem !important;
+  border-radius: 0.75rem !important; /* rounded-xl */
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  cursor: pointer;
+}
+.brutal-btn-primary:hover {
+  background-color: #6366f1 !important;
+  box-shadow: 0 10px 20px -10px rgba(79, 70, 229, 0.45) !important;
+  transform: translateY(-1px);
+}
+.brutal-btn-primary:active {
+  transform: translateY(0px);
+}
+
+.brutal-btn-secondary {
+  background-color: #ffffff !important;
+  color: #334155 !important;
+  border: 1px solid #d1d5db !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.15s ease !important;
+  cursor: pointer;
+}
+.brutal-btn-secondary:hover {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+.brutal-input {
+  width: 100% !important;
+  font-family: var(--font-sans) !important; /* sleek sans */
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 0.75rem !important;
+  padding: 0.5rem 0.75rem !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02) !important;
+  transition: all 0.15s ease !important;
+}
+.brutal-input:focus {
+  outline: none !important;
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12) !important;
+}
+
+.brutal-header {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: -0.01em;
+  color: #0f172a;
+}
+
+.brutal-badge {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  text-transform: none;
+  font-size: 11px !important;
+  padding: 0.2rem 0.5rem !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 0.5rem !important;
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+/* Gorgeous fluid pills */
+.brutal-badge-emerald {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  text-transform: none;
+  font-size: 11px !important;
+  padding: 0.2rem 0.5rem !important;
+  border: 1px solid #bbf7d0 !important;
+  border-radius: 0.5rem !important;
+  background-color: #f0fdf4;
+  color: #15803d;
+}
+
+.brutal-badge-amber {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  text-transform: none;
+  font-size: 11px !important;
+  padding: 0.2rem 0.5rem !important;
+  border: 1px solid #fde047 !important;
+  border-radius: 0.5rem !important;
+  background-color: #fefce8;
+  color: #a16207;
+}
+
+.brutal-badge-rose {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  text-transform: none;
+  font-size: 11px !important;
+  padding: 0.2rem 0.5rem !important;
+  border: 1px solid #fecdd3 !important;
+  border-radius: 0.5rem !important;
+  background-color: #fff1f2;
+  color: #b91c1c;
+}
+
+.brutal-badge-indigo {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  text-transform: none;
+  font-size: 11px !important;
+  padding: 0.2rem 0.5rem !important;
+  border: 1px solid #c7d2fe !important;
+  border-radius: 0.5rem !important;
+  background-color: #eef2ff;
+  color: #4338ca;
+}
+
+.brutal-ticker-footer {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border-top: 1px solid #334155 !important;
+}
+
+/* Animations & glass layout utilities */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.fade-in-slide {
+  animation: slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scrollbar customization */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* High-fidelity CSS Print Layout optimizations for clean PDF reports generation */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background-image: none !important;
+  }
+  
+  header, nav, button, form, footer, .print\:hidden {
+    display: none !important;
+  }
+  
+  .print\:block {
+    display: block !important;
+  }
+  
+  #financial-charts-container, 
+  #receipt-scanner-container, 
+  #statement-importer-container, 
+  #recurring-bills-container, 
+  #cloud-sync-container, 
+  #ai-personal-advisor-container {
+    display: none !important;
+  }
+}

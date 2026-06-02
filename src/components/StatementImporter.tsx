@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { Upload, FileText, CheckCircle2, ArrowDownToLine, RefreshCw, AlertCircle } from "lucide-react";
+import {
+  Upload, FileText, CheckCircle2, ArrowDownToLine, RefreshCw, AlertCircle,
+} from "lucide-react";
 import { Transaction } from "../types";
 
 interface StatementImporterProps {
@@ -7,7 +9,10 @@ interface StatementImporterProps {
   onAddAlert: (title: string, message: string, type: "warning" | "info" | "success") => void;
 }
 
-export default function StatementImporter({ onImportTransactions, onAddAlert }: StatementImporterProps) {
+export default function StatementImporter({
+  onImportTransactions,
+  onAddAlert,
+}: StatementImporterProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -19,19 +24,15 @@ export default function StatementImporter({ onImportTransactions, onAddAlert }: 
     e.preventDefault();
     setIsDragging(true);
   };
-
-  const handleDragLeave = () => {
-    setIsDragging(false);
-  };
+  const handleDragLeave = () => setIsDragging(false);
 
   const processFile = async (file: File) => {
     setSelectedFile(file);
     setIsProcessing(true);
     setErrorMessage(null);
     setParsedTransactions([]);
-    
     setProcessingStatus("Reading document data stream...");
-    
+
     const reader = new FileReader();
     reader.onerror = () => {
       setErrorMessage("Failed to read the bank statement file.");
@@ -43,17 +44,13 @@ export default function StatementImporter({ onImportTransactions, onAddAlert }: 
       const fileBase64 = base64Content.split(",")[1] || base64Content;
       const mimeType = file.type || (file.name.endsWith(".pdf") ? "application/pdf" : "text/csv");
 
-      setProcessingStatus("Submitting bank statement to Gemini AI engine...");
+      setProcessingStatus("Submitting to Gemini AI engine...");
 
       try {
         const response = await fetch("/api/parse-bank-statement", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            fileBase64,
-            fileName: file.name,
-            mimeType
-          })
+          body: JSON.stringify({ fileBase64, fileName: file.name, mimeType }),
         });
 
         if (!response.ok) {
@@ -62,7 +59,7 @@ export default function StatementImporter({ onImportTransactions, onAddAlert }: 
         }
 
         const data = await response.json();
-        
+
         if (data.transactions && Array.isArray(data.transactions)) {
           const mapped: Transaction[] = data.transactions.map((t: any) => ({
             id: `imported-${Math.random().toString(36).substring(2, 9)}`,
@@ -72,25 +69,17 @@ export default function StatementImporter({ onImportTransactions, onAddAlert }: 
             amount: parseFloat(t.amount) || 0,
             category: t.category || "Other",
             isRecurring: !!t.isRecurring,
-            source: "bank_statement",
-            notes: `Imported from bank statement: ${file.name}`
+            source: "bank_statement" as const,
+            notes: `Imported from: ${file.name}`,
           }));
-
           setParsedTransactions(mapped);
-          onAddAlert(
-            "Statement Parsed",
-            `Extracted ${mapped.length} historical records using Gemini AI!`,
-            "success"
-          );
+          onAddAlert("Statement Parsed", `Extracted ${mapped.length} records using Gemini AI!`, "success");
         } else {
-          throw new Error("No readable transactions list generated from bank statement.");
+          throw new Error("No readable transactions found in bank statement.");
         }
       } catch (err: any) {
-        console.error(err);
-        setErrorMessage(
-          err.message || "Could not analyze the statement. Max file sizes are ~20MB for PDF."
-        );
-        onAddAlert("Import Failed", "Gemini could not parse bank statement format.", "warning");
+        setErrorMessage(err.message || "Could not analyze the statement. Max size ~20MB for PDF.");
+        onAddAlert("Import Failed", "Gemini could not parse the bank statement format.", "warning");
       } finally {
         setIsProcessing(false);
       }
@@ -103,124 +92,201 @@ export default function StatementImporter({ onImportTransactions, onAddAlert }: 
     e.preventDefault();
     setIsDragging(false);
     const file = e.dataTransfer.files?.[0];
-    if (file) {
-      processFile(file);
-    }
+    if (file) processFile(file);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      processFile(file);
-    }
+    if (file) processFile(file);
   };
 
   const triggerImport = () => {
     if (parsedTransactions.length === 0) return;
-    
     onImportTransactions(parsedTransactions);
     onAddAlert(
-      "Imported Saved",
-      `Added ${parsedTransactions.length} transaction entries to active portfolio logs.`,
+      "Import Saved",
+      `Added ${parsedTransactions.length} transaction entries to your ledger.`,
       "success"
     );
-    
     setSelectedFile(null);
     setParsedTransactions([]);
   };
 
   return (
-    <div id="statement-importer-container" className="bg-white border border-slate-100 p-6 rounded-2xl shadow-sm h-full flex flex-col justify-between hover:shadow-md transition-all duration-300">
+    <div
+      id="statement-importer-container"
+      className="p-6 rounded-2xl h-full flex flex-col justify-between transition-all duration-300 brutal-card"
+    >
       <div>
+        {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-lg font-bold text-slate-800 tracking-tight flex items-center gap-2 font-display">
-              <FileText className="w-5 h-5 text-indigo-500" />
+            <h3
+              className="text-lg font-bold tracking-tight flex items-center gap-2 font-display"
+              style={{ color: "var(--color-text-primary)" }}
+            >
+              <FileText className="w-5 h-5" style={{ color: "var(--color-brand-600)" }} />
               File Statement Ingestion
             </h3>
-            <p className="text-xs text-slate-400 mt-1">
-              Drop bank statement PDF or CSV spreadsheets to analyze history instantly.
+            <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>
+              Drop bank statement PDF or CSV files to analyze history instantly.
             </p>
           </div>
         </div>
 
+        {/* Error message */}
         {errorMessage && (
-          <div className="bg-rose-50 border border-rose-100 text-rose-800 text-xs p-3.5 rounded-xl flex items-start gap-2 mb-4">
+          <div
+            className="text-xs p-3.5 rounded-xl flex items-start gap-2 mb-4 border"
+            style={{
+              backgroundColor: "var(--color-danger-bg)",
+              borderColor: "var(--color-danger-border)",
+              color: "var(--color-danger-text)",
+            }}
+          >
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{errorMessage}</span>
           </div>
         )}
 
-        {/* Drag & Drop Visual Box */}
+        {/* Drag & drop zone */}
         {!selectedFile && (
           <div
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            className={`border border-dashed p-8 rounded-2xl text-center bg-slate-50/20 cursor-pointer transition-all flex flex-col items-center justify-center gap-4 group ${
-              isDragging ? "bg-indigo-50 border-indigo-400 scale-[1.01]" : "border-slate-200 hover:bg-slate-50"
-            }`}
+            className="border border-dashed p-8 rounded-2xl text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-4 group"
+            style={{
+              backgroundColor: isDragging ? "var(--color-brand-50)" : "var(--color-bg-subtle)",
+              borderColor: isDragging ? "var(--color-brand-500)" : "var(--color-border-medium)",
+              transform: isDragging ? "scale(1.01)" : "scale(1)",
+            }}
           >
-            <div className="h-12 w-12 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center group-hover:scale-105 transition-transform">
-              <Upload className="w-6 h-6 text-indigo-500" />
+            <div
+              className="h-12 w-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105"
+              style={{ backgroundColor: "var(--color-bg-muted)" }}
+            >
+              <Upload className="w-6 h-6" style={{ color: "var(--color-brand-600)" }} />
             </div>
             <div>
-              <p className="text-sm font-semibold text-slate-700">Drag & Drop Statement File</p>
-              <p className="text-xs text-slate-400 mt-1 font-sans">Accepts PDF bank outputs or CSV formats up to 20MB</p>
+              <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+                Drag & Drop Statement File
+              </p>
+              <p className="text-xs mt-1 font-sans" style={{ color: "var(--color-text-muted)" }}>
+                Accepts PDF bank outputs or CSV formats up to 20MB
+              </p>
             </div>
-            
-            <label className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs py-2 px-4 rounded-xl flex items-center gap-2 cursor-pointer transition-colors shadow-2xs">
+            <label
+              className="text-white font-semibold text-xs py-2 px-4 rounded-xl flex items-center gap-2 cursor-pointer transition-colors"
+              style={{ backgroundColor: "var(--color-brand-600)" }}
+            >
               Browse Files
-              <input
-                type="file"
-                accept=".pdf,.csv"
-                onChange={handleFileChange}
-                className="hidden"
-              />
+              <input type="file" accept=".pdf,.csv" onChange={handleFileChange} className="hidden" />
             </label>
           </div>
         )}
 
-        {/* Active Uploading / Processing Screen */}
+        {/* Processing screen */}
         {selectedFile && isProcessing && (
-          <div className="bg-indigo-50/40 border border-indigo-100 p-8 rounded-2xl flex flex-col items-center justify-center text-center shadow-2xs">
-            <RefreshCw className="w-10 h-10 text-indigo-650 animate-spin mb-4" />
-            <span className="text-sm font-semibold text-slate-800">Processing "{selectedFile.name}"</span>
-            <span className="text-xs text-slate-400 mt-1.5 font-mono uppercase tracking-wide">{processingStatus}</span>
+          <div
+            className="border p-8 rounded-2xl flex flex-col items-center justify-center text-center"
+            style={{
+              backgroundColor: "var(--color-brand-50)",
+              borderColor: "var(--color-brand-100)",
+            }}
+          >
+            <RefreshCw className="w-10 h-10 animate-spin mb-4" style={{ color: "var(--color-brand-600)" }} />
+            <span className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+              Processing "{selectedFile.name}"
+            </span>
+            <span className="text-xs mt-1.5 font-mono uppercase tracking-wide" style={{ color: "var(--color-text-muted)" }}>
+              {processingStatus}
+            </span>
           </div>
         )}
 
-        {/* Result grid preview lists */}
+        {/* Preview grid */}
         {selectedFile && !isProcessing && parsedTransactions.length > 0 && (
-          <div className="bg-slate-50 border border-slate-100 p-4 rounded-xl flex flex-col">
+          <div
+            className="border p-4 rounded-xl flex flex-col"
+            style={{
+              backgroundColor: "var(--color-bg-subtle)",
+              borderColor: "var(--color-border-subtle)",
+            }}
+          >
             <div className="flex justify-between items-center mb-3">
               <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 animate-bounce" />
-                <span className="text-xs font-semibold text-slate-700">Ready to Ingest:</span>
+                <CheckCircle2 className="w-4 h-4 animate-bounce" style={{ color: "var(--color-success-icon)" }} />
+                <span className="text-xs font-semibold" style={{ color: "var(--color-text-primary)" }}>
+                  Ready to Import:
+                </span>
               </div>
-              <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-100/60 rounded-full px-2.5 py-0.5">
-                {parsedTransactions.length} Items Identified
+              <span
+                className="text-[10px] font-bold rounded-full px-2.5 py-0.5 border"
+                style={{
+                  backgroundColor: "var(--color-brand-50)",
+                  color: "var(--color-brand-600)",
+                  borderColor: "var(--color-brand-100)",
+                }}
+              >
+                {parsedTransactions.length} Items
               </span>
             </div>
 
-            <div className="max-h-52 overflow-y-auto border border-slate-200/60 rounded-xl bg-white text-xs divide-y divide-slate-100 select-none">
+            <div
+              className="max-h-52 overflow-y-auto border rounded-xl text-xs divide-y"
+              style={{
+                backgroundColor: "var(--color-bg-surface)",
+                borderColor: "var(--color-border-medium)",
+                divideColor: "var(--color-border-subtle)",
+              }}
+            >
               {parsedTransactions.map((tx) => (
-                <div key={tx.id} className="p-3 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                <div
+                  key={tx.id}
+                  className="p-3 flex items-center justify-between transition-colors"
+                  style={{ borderColor: "var(--color-border-subtle)" }}
+                >
                   <div className="min-w-0 flex-1 pr-3">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="text-[9px] text-slate-400 font-mono bg-slate-50 px-2 py-0.5 rounded border border-slate-100">{tx.date}</span>
-                      <span className="font-semibold text-slate-700 truncate max-w-[190px]" title={tx.merchant}>{tx.merchant}</span>
+                      <span
+                        className="text-[9px] font-mono px-2 py-0.5 rounded border"
+                        style={{
+                          backgroundColor: "var(--color-bg-subtle)",
+                          color: "var(--color-text-disabled)",
+                          borderColor: "var(--color-border-subtle)",
+                        }}
+                      >
+                        {tx.date}
+                      </span>
+                      <span
+                        className="font-semibold truncate max-w-[190px]"
+                        style={{ color: "var(--color-text-primary)" }}
+                        title={tx.merchant}
+                      >
+                        {tx.merchant}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2 mt-2">
                       <span className="brutal-badge-indigo">{tx.category}</span>
                       {tx.isRecurring && (
-                        <span className="text-[9px] font-bold bg-amber-50 text-amber-750 border border-amber-200 px-2 py-0.5 rounded">
+                        <span
+                          className="text-[9px] font-bold border px-2 py-0.5 rounded"
+                          style={{
+                            backgroundColor: "var(--color-warning-bg)",
+                            color: "var(--color-warning-text)",
+                            borderColor: "var(--color-warning-border)",
+                          }}
+                        >
                           Recurring
                         </span>
                       )}
                     </div>
                   </div>
-                  <span className={`font-mono font-bold shrink-0 text-right ${tx.amount < 0 ? "text-red-500" : "text-emerald-600"}`}>
+                  <span
+                    className="font-mono font-bold shrink-0 text-right"
+                    style={{ color: tx.amount < 0 ? "#f43f5e" : "#10b981" }}
+                  >
                     {tx.amount < 0 ? "-" : "+"}${Math.abs(tx.amount).toFixed(2)}
                   </span>
                 </div>
@@ -230,14 +296,17 @@ export default function StatementImporter({ onImportTransactions, onAddAlert }: 
         )}
       </div>
 
+      {/* Import action buttons */}
       {selectedFile && !isProcessing && parsedTransactions.length > 0 && (
         <div className="mt-4 flex gap-2.5">
           <button
-            onClick={() => {
-              setSelectedFile(null);
-              setParsedTransactions([]);
+            onClick={() => { setSelectedFile(null); setParsedTransactions([]); }}
+            className="flex-1 font-semibold text-xs py-2.5 rounded-xl transition-colors cursor-pointer border"
+            style={{
+              backgroundColor: "var(--color-bg-subtle)",
+              color: "var(--color-text-secondary)",
+              borderColor: "var(--color-border-medium)",
             }}
-            className="flex-1 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs py-2.5 rounded-xl transition-colors cursor-pointer"
           >
             Cancel
           </button>

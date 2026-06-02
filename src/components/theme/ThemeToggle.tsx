@@ -4,7 +4,7 @@ import { Sun, Moon } from "lucide-react";
 
 export default function ThemeToggle() {
   const { profile, updateThemePreference } = useAuth();
-  
+
   const currentTheme = getThemeFromPreference(profile?.theme_preference);
 
   const handleToggle = () => {
@@ -15,24 +15,38 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={handleToggle}
-      className="p-2.5 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100 transition-all duration-300 cursor-pointer shadow-3xs"
+      className="p-2.5 rounded-xl border transition-all duration-200 cursor-pointer"
+      style={{
+        backgroundColor: "var(--color-bg-surface)",
+        borderColor: "var(--color-border-medium)",
+        color: "var(--color-text-secondary)",
+        boxShadow: "var(--shadow-xs)",
+      }}
       title={`Switch to ${currentTheme === "light" ? "Dark" : "Light"} Mode`}
       id="theme-preference-toggle-btn"
+      aria-label={`Switch to ${currentTheme === "light" ? "dark" : "light"} mode`}
     >
       <div className="relative w-4 h-4 overflow-hidden">
+        {/* Sun icon — visible in light mode */}
         <span
-          className={`absolute inset-0 flex items-center justify-center transform transition-transform duration-300 ${
-            currentTheme === "light" ? "translate-y-0 scale-100" : "translate-y-6 scale-0"
-          }`}
+          className="absolute inset-0 flex items-center justify-center transform transition-all duration-300"
+          style={{
+            opacity: currentTheme === "light" ? 1 : 0,
+            transform: currentTheme === "light" ? "translateY(0) scale(1)" : "translateY(8px) scale(0)",
+          }}
         >
-          <Sun className="w-4 h-4 text-amber-500 font-semibold" />
+          <Sun className="w-4 h-4" style={{ color: "#f59e0b" }} />
         </span>
+
+        {/* Moon icon — visible in dark mode */}
         <span
-          className={`absolute inset-0 flex items-center justify-center transform transition-transform duration-300 ${
-            currentTheme === "dark" ? "translate-y-0 scale-100" : "-translate-y-6 scale-0"
-          }`}
+          className="absolute inset-0 flex items-center justify-center transform transition-all duration-300"
+          style={{
+            opacity: currentTheme === "dark" ? 1 : 0,
+            transform: currentTheme === "dark" ? "translateY(0) scale(1)" : "translateY(-8px) scale(0)",
+          }}
         >
-          <Moon className="w-4 h-4 text-indigo-400" />
+          <Moon className="w-4 h-4" style={{ color: "#818cf8" }} />
         </span>
       </div>
     </button>

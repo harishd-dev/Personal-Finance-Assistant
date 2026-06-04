@@ -304,7 +304,7 @@ export default function App() {
           setIncome(parsed.monthly_income);
           return;
         }
-      } catch (e) { }
+      } catch (e) {}
     }
 
     // Fall back to localStorage
@@ -698,13 +698,13 @@ export default function App() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4"
-        style={{ backgroundColor: "var(--color-bg-base)" }}>
+           style={{ backgroundColor: "var(--color-bg-base)" }}>
         <div className="flex flex-col items-center gap-4 text-center">
           <div className="h-11 w-11 bg-indigo-600 text-white flex items-center justify-center rounded-2xl shadow-lg animate-bounce">
             <Wallet className="w-5 h-5 text-indigo-100" />
           </div>
           <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider font-mono"
-            style={{ color: "var(--color-text-muted)" }}>
+               style={{ color: "var(--color-text-muted)" }}>
             <RefreshCw className="w-4 h-4 animate-spin text-indigo-500" />
             Synchronizing Secure Session...
           </div>
@@ -720,15 +720,15 @@ export default function App() {
   // ----------------------------------------------------------------
   return (
     <div className="min-h-screen flex flex-col antialiased font-sans"
-      style={{ backgroundColor: "var(--color-bg-base)", color: "var(--color-text-primary)" }}>
+         style={{ backgroundColor: "var(--color-bg-base)", color: "var(--color-text-primary)" }}>
 
       {/* ── HEADER ── */}
       <header className="border-b sticky top-0 z-50 print:hidden backdrop-blur-md"
-        style={{
-          backgroundColor: "rgba(var(--color-bg-surface-raw, 255,255,255), 0.90)",
-          borderBottomColor: "var(--color-border-medium)",
-          boxShadow: "var(--shadow-xs)",
-        }}>
+              style={{
+                backgroundColor: "rgba(var(--color-bg-surface-raw, 255,255,255), 0.90)",
+                borderBottomColor: "var(--color-border-medium)",
+                boxShadow: "var(--shadow-xs)",
+              }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-3">
             <div className="h-9 w-9 bg-indigo-600 text-white flex items-center justify-center rounded-xl shadow-sm">
@@ -736,11 +736,11 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-lg font-bold tracking-tight font-display"
-                style={{ color: "var(--color-text-primary)" }}>
+                  style={{ color: "var(--color-text-primary)" }}>
                 AI Finance Assistant
               </h1>
               <p className="text-[9px] font-semibold tracking-wider uppercase"
-                style={{ color: "var(--color-text-muted)" }}>
+                 style={{ color: "var(--color-text-muted)" }}>
                 REAL-TIME CASHFLOW DISCOVERY
               </p>
             </div>
@@ -801,20 +801,20 @@ export default function App() {
 
               {alertMenuOpen && (
                 <div className="absolute right-0 mt-3 w-80 rounded-2xl z-50 overflow-hidden"
-                  style={{
-                    backgroundColor: "var(--color-bg-elevated)",
-                    border: "1px solid var(--color-border-medium)",
-                    boxShadow: "var(--shadow-lg)",
-                  }}>
+                     style={{
+                       backgroundColor: "var(--color-bg-elevated)",
+                       border: "1px solid var(--color-border-medium)",
+                       boxShadow: "var(--shadow-lg)",
+                     }}>
                   <div className="flex items-center justify-between p-4 border-b"
-                    style={{ borderColor: "var(--color-border-subtle)" }}>
+                       style={{ borderColor: "var(--color-border-subtle)" }}>
                     <span className="text-xs font-bold uppercase tracking-wider"
-                      style={{ color: "var(--color-text-primary)" }}>
+                          style={{ color: "var(--color-text-primary)" }}>
                       Notifications
                     </span>
                     <button onClick={() => setAlertMenuOpen(false)}
-                      className="p-1 rounded-lg transition-colors cursor-pointer"
-                      style={{ color: "var(--color-text-muted)" }}>
+                            className="p-1 rounded-lg transition-colors cursor-pointer"
+                            style={{ color: "var(--color-text-muted)" }}>
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -826,14 +826,14 @@ export default function App() {
                     ) : (
                       alerts.map((a) => (
                         <div key={a.id} className="text-xs flex gap-2.5 items-start p-2.5 rounded-xl"
-                          style={{
-                            backgroundColor: "var(--color-bg-subtle)",
-                            border: "1px solid var(--color-border-subtle)",
-                          }}>
+                             style={{
+                               backgroundColor: "var(--color-bg-subtle)",
+                               border: "1px solid var(--color-border-subtle)",
+                             }}>
                           <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" style={{
                             color: a.type === "warning" ? "var(--color-warning-icon)"
                               : a.type === "success" ? "var(--color-success-icon)"
-                                : "var(--color-brand-500)"
+                              : "var(--color-brand-500)"
                           }} />
                           <div>
                             <h5 className="font-semibold text-[11px]" style={{ color: "var(--color-text-primary)" }}>
@@ -849,8 +849,8 @@ export default function App() {
                   </div>
                   <div className="border-t p-3 text-center" style={{ borderColor: "var(--color-border-subtle)" }}>
                     <button onClick={() => setAlerts([])}
-                      className="text-[10px] font-bold uppercase tracking-wider cursor-pointer"
-                      style={{ color: "var(--color-danger-icon)" }}>
+                            className="text-[10px] font-bold uppercase tracking-wider cursor-pointer"
+                            style={{ color: "var(--color-danger-icon)" }}>
                       Clear All
                     </button>
                   </div>
@@ -860,14 +860,14 @@ export default function App() {
 
             {/* Income input */}
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border transition-all"
-              style={{
-                backgroundColor: "var(--color-bg-surface)",
-                borderColor: "var(--color-border-medium)",
-              }}>
+                 style={{
+                   backgroundColor: "var(--color-bg-surface)",
+                   borderColor: "var(--color-border-medium)",
+                 }}>
               <DollarSign className="w-4 h-4" style={{ color: "var(--color-success-icon)" }} />
               <div className="flex flex-col">
                 <span className="text-[8px] font-bold uppercase tracking-wider leading-none"
-                  style={{ color: "var(--color-text-muted)" }}>Monthly wage</span>
+                      style={{ color: "var(--color-text-muted)" }}>Monthly wage</span>
                 <input
                   type="number"
                   value={income}
@@ -890,7 +890,7 @@ export default function App() {
 
         {/* TAB NAVIGATION */}
         <div className="flex flex-wrap border-b pb-3.5 gap-4 items-center justify-between print:hidden"
-          style={{ borderColor: "var(--color-border-medium)" }}>
+             style={{ borderColor: "var(--color-border-medium)" }}>
           <nav className="flex flex-wrap gap-1.5 min-w-0 flex-1">
             {[
               { id: "dashboard", label: "Dashboard", icon: Compass },
@@ -908,10 +908,10 @@ export default function App() {
                   activeTab === id
                     ? { backgroundColor: "var(--color-brand-600)", color: "#ffffff" }
                     : {
-                      backgroundColor: "var(--color-bg-surface)",
-                      border: "1px solid var(--color-border-medium)",
-                      color: "var(--color-text-muted)",
-                    }
+                        backgroundColor: "var(--color-bg-surface)",
+                        border: "1px solid var(--color-border-medium)",
+                        color: "var(--color-text-muted)",
+                      }
                 }
               >
                 <Icon className="w-3.5 h-3.5" />
@@ -961,11 +961,11 @@ export default function App() {
                   {[
                     { label: "Net Monthly Wage", value: `$${income.toFixed(2)}`, color: "var(--color-success-icon)", hint: "Primary salary source" },
                     { label: "Variable Spent", value: `$${totalVariablePaid.toFixed(2)}`, color: "var(--color-warning-icon)", hint: "Variable ledger total" },
-                    { label: "Commitment Bills", value: `$${bills.reduce((a, b) => a + b.currentCost, 0).toFixed(2)}`, color: "var(--color-brand-600)", hint: "Recurring monthly" },
+                    { label: "Commitment Bills", value: `$${bills.reduce((a,b) => a + b.currentCost, 0).toFixed(2)}`, color: "var(--color-brand-600)", hint: "Recurring monthly" },
                   ].map(({ label, value, color, hint }) => (
                     <div key={label} className="p-5 rounded-2xl transition-all duration-300 brutal-card">
                       <span className="text-[10px] font-bold uppercase tracking-wider block"
-                        style={{ color: "var(--color-text-muted)" }}>{label}</span>
+                            style={{ color: "var(--color-text-muted)" }}>{label}</span>
                       <span className="font-mono font-bold text-2xl block mt-1.5" style={{ color }}>{value}</span>
                       <span className="text-[10px] mt-1 block" style={{ color: "var(--color-text-disabled)" }}>{hint}</span>
                     </div>
@@ -981,7 +981,7 @@ export default function App() {
                 {/* Ledger Table */}
                 <div className="rounded-2xl p-6 transition-all duration-300 brutal-card">
                   <div className="flex items-center justify-between mb-4 flex-wrap gap-2 pb-2.5 border-b"
-                    style={{ borderColor: "var(--color-border-subtle)" }}>
+                       style={{ borderColor: "var(--color-border-subtle)" }}>
                     <div>
                       <h3 className="text-base font-bold tracking-tight" style={{ color: "var(--color-text-primary)" }}>
                         Ledger Transactions
@@ -1005,45 +1005,45 @@ export default function App() {
 
                   {/* Manual entry form */}
                   <form onSubmit={handleAddManualTransaction}
-                    className="grid grid-cols-2 lg:grid-cols-12 gap-2.5 pb-4 mb-4 border-b items-end"
-                    style={{ borderColor: "var(--color-border-subtle)" }}>
+                        className="grid grid-cols-2 lg:grid-cols-12 gap-2.5 pb-4 mb-4 border-b items-end"
+                        style={{ borderColor: "var(--color-border-subtle)" }}>
                     <div className="col-span-2 lg:col-span-3">
                       <label className="text-[10px] font-semibold uppercase tracking-wider block mb-1"
-                        style={{ color: "var(--color-text-muted)" }}>Merchant</label>
+                             style={{ color: "var(--color-text-muted)" }}>Merchant</label>
                       <input type="text" placeholder="Target, Uber, Rent..." value={manualMerchant}
-                        onChange={(e) => setManualMerchant(e.target.value)} className="brutal-input text-xs" required />
+                             onChange={(e) => setManualMerchant(e.target.value)} className="brutal-input text-xs" required />
                     </div>
                     <div className="col-span-1 lg:col-span-2">
                       <label className="text-[10px] font-semibold uppercase tracking-wider block mb-1"
-                        style={{ color: "var(--color-text-muted)" }}>Amount ($)</label>
+                             style={{ color: "var(--color-text-muted)" }}>Amount ($)</label>
                       <input type="number" step="0.01" placeholder="0.00" value={manualAmount}
-                        onChange={(e) => setManualAmount(e.target.value)} className="brutal-input text-xs font-mono" required />
+                             onChange={(e) => setManualAmount(e.target.value)} className="brutal-input text-xs font-mono" required />
                     </div>
                     <div className="col-span-1 lg:col-span-2">
                       <label className="text-[10px] font-semibold uppercase tracking-wider block mb-1"
-                        style={{ color: "var(--color-text-muted)" }}>Category</label>
+                             style={{ color: "var(--color-text-muted)" }}>Category</label>
                       <select value={manualCategory} onChange={(e) => setManualCategory(e.target.value as any)}
-                        className="brutal-input text-xs cursor-pointer">
-                        {["Food", "Utilities", "Entertainment", "Transportation", "Shopping", "Health", "Education", "Income", "Other"].map(c => (
+                              className="brutal-input text-xs cursor-pointer">
+                        {["Food","Utilities","Entertainment","Transportation","Shopping","Health","Education","Income","Other"].map(c => (
                           <option key={c} value={c}>{c}</option>
                         ))}
                       </select>
                     </div>
                     <div className="col-span-1 lg:col-span-2">
                       <label className="text-[10px] font-semibold uppercase tracking-wider block mb-1"
-                        style={{ color: "var(--color-text-muted)" }}>Date</label>
+                             style={{ color: "var(--color-text-muted)" }}>Date</label>
                       <input type="date" value={manualDate} onChange={(e) => setManualDate(e.target.value)}
-                        className="brutal-input text-xs cursor-pointer" required />
+                             className="brutal-input text-xs cursor-pointer" required />
                     </div>
                     <button type="submit"
-                      className="col-span-1 lg:col-span-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs py-2 px-3 rounded-xl flex items-center justify-center gap-1 cursor-pointer transition-colors">
+                            className="col-span-1 lg:col-span-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs py-2 px-3 rounded-xl flex items-center justify-center gap-1 cursor-pointer transition-colors">
                       <Plus className="w-3.5 h-3.5" /> Log Entry
                     </button>
                   </form>
 
                   {/* Transaction list */}
                   <div className="max-h-80 overflow-y-auto divide-y pr-1 select-none"
-                    style={{ borderColor: "var(--color-border-subtle)" }}>
+                       style={{ borderColor: "var(--color-border-subtle)" }}>
                     {transactions.length === 0 ? (
                       <div className="text-center py-10 text-xs" style={{ color: "var(--color-text-disabled)" }}>
                         No transactions yet. Scan a receipt or import a statement above.
@@ -1051,19 +1051,19 @@ export default function App() {
                     ) : (
                       transactions.map((tx) => (
                         <div key={tx.id} className="py-3 flex items-center justify-between px-1 transition-colors"
-                          style={{ borderColor: "var(--color-border-subtle)" }}>
+                             style={{ borderColor: "var(--color-border-subtle)" }}>
                           <div className="min-w-0 pr-3">
                             <div className="flex items-center gap-2">
                               <span className="text-[9px] font-mono px-2 py-0.5 rounded border"
-                                style={{
-                                  backgroundColor: "var(--color-bg-subtle)",
-                                  color: "var(--color-text-disabled)",
-                                  borderColor: "var(--color-border-subtle)",
-                                }}>
+                                    style={{
+                                      backgroundColor: "var(--color-bg-subtle)",
+                                      color: "var(--color-text-disabled)",
+                                      borderColor: "var(--color-border-subtle)",
+                                    }}>
                                 {tx.date}
                               </span>
                               <span className="text-xs font-semibold truncate" title={tx.merchant}
-                                style={{ color: "var(--color-text-primary)" }}>
+                                    style={{ color: "var(--color-text-primary)" }}>
                                 {tx.merchant}
                               </span>
                             </div>
@@ -1076,13 +1076,13 @@ export default function App() {
                           </div>
                           <div className="flex items-center gap-3">
                             <span className="font-mono text-xs font-bold"
-                              style={{ color: tx.amount < 0 ? "#f43f5e" : "#10b981" }}>
+                                  style={{ color: tx.amount < 0 ? "#f43f5e" : "#10b981" }}>
                               {tx.amount < 0 ? "-" : "+"}${Math.abs(tx.amount).toFixed(2)}
                             </span>
                             <button onClick={() => handleDeleteTransaction(tx.id, tx.merchant, tx.amount)}
-                              className="p-1.5 rounded-lg transition-colors cursor-pointer"
-                              style={{ color: "var(--color-text-disabled)" }}
-                              title="Delete">
+                                    className="p-1.5 rounded-lg transition-colors cursor-pointer"
+                                    style={{ color: "var(--color-text-disabled)" }}
+                                    title="Delete">
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
                           </div>
@@ -1155,7 +1155,7 @@ export default function App() {
             <div className="max-w-4xl mx-auto w-full">
               <div className="rounded-2xl p-8 brutal-card print:border-none print:shadow-none print:p-0">
                 <div className="flex justify-between items-center pb-5 border-b mb-6 print:hidden"
-                  style={{ borderColor: "var(--color-border-subtle)" }}>
+                     style={{ borderColor: "var(--color-border-subtle)" }}>
                   <div>
                     <h3 className="font-bold text-sm" style={{ color: "var(--color-text-primary)" }}>
                       Monthly Review Document
@@ -1165,7 +1165,7 @@ export default function App() {
                     </p>
                   </div>
                   <button onClick={handleTriggerPDFPrintReview}
-                    className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs py-2 px-4 rounded-xl cursor-pointer transition-colors">
+                          className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs py-2 px-4 rounded-xl cursor-pointer transition-colors">
                     Print / Save PDF
                   </button>
                 </div>
@@ -1177,21 +1177,21 @@ export default function App() {
                         Monthly Financial Audit Card
                       </h2>
                       <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>
-                        {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long" })}
+                        {new Date().toLocaleDateString("en-US", { year:"numeric", month:"long" })}
                       </p>
                     </div>
                     <span className="text-[10px] font-bold uppercase rounded-full px-3 py-1"
-                      style={{
-                        backgroundColor: "var(--color-success-bg)",
-                        color: "var(--color-success-text)",
-                        border: "1px solid var(--color-success-border)",
-                      }}>
+                          style={{
+                            backgroundColor: "var(--color-success-bg)",
+                            color: "var(--color-success-text)",
+                            border: "1px solid var(--color-success-border)",
+                          }}>
                       Audit Ready
                     </span>
                   </div>
 
                   <div className="grid grid-cols-3 gap-0 rounded-xl overflow-hidden"
-                    style={{ border: "1px solid var(--color-border-medium)" }}>
+                       style={{ border: "1px solid var(--color-border-medium)" }}>
                     {[
                       { label: "Monthly Income", value: `$${income.toFixed(2)}`, color: "var(--color-success-icon)" },
                       { label: "Variable Spent", value: `$${totalVariablePaid.toFixed(2)}`, color: "var(--color-warning-icon)" },
@@ -1202,7 +1202,7 @@ export default function App() {
                         borderRight: i < 2 ? "1px solid var(--color-border-medium)" : "none",
                       }}>
                         <span className="text-[9px] font-semibold block uppercase"
-                          style={{ color: "var(--color-text-muted)" }}>{label}</span>
+                              style={{ color: "var(--color-text-muted)" }}>{label}</span>
                         <span className="font-bold text-base mt-0.5 block" style={{ color }}>{value}</span>
                       </div>
                     ))}
@@ -1211,13 +1211,13 @@ export default function App() {
                   {/* Bills table */}
                   <div className="space-y-3">
                     <h3 className="text-xs font-bold uppercase tracking-widest border-b pb-1.5"
-                      style={{ color: "var(--color-text-secondary)", borderColor: "var(--color-border-subtle)" }}>
+                        style={{ color: "var(--color-text-secondary)", borderColor: "var(--color-border-subtle)" }}>
                       Monthly Commitment Bills
                     </h3>
                     <table className="w-full text-xs font-sans">
                       <thead>
                         <tr className="text-[10px] font-semibold uppercase text-left"
-                          style={{ color: "var(--color-text-muted)" }}>
+                            style={{ color: "var(--color-text-muted)" }}>
                           <th className="pb-2">Subscription</th>
                           <th className="pb-2">Category</th>
                           <th className="pb-2">Due Day</th>
@@ -1231,7 +1231,7 @@ export default function App() {
                             <td className="py-2.5" style={{ color: "var(--color-text-muted)" }}>{b.category}</td>
                             <td className="py-2.5" style={{ color: "var(--color-text-muted)" }}>Day {b.dueDate}</td>
                             <td className="py-2.5 text-right font-mono font-bold"
-                              style={{ color: "var(--color-text-primary)" }}>
+                                style={{ color: "var(--color-text-primary)" }}>
                               ${b.currentCost.toFixed(2)}
                             </td>
                           </tr>
@@ -1243,7 +1243,7 @@ export default function App() {
                   {/* Applied savings */}
                   <div className="space-y-3">
                     <h3 className="text-xs font-bold uppercase tracking-widest border-b pb-1.5"
-                      style={{ color: "var(--color-text-secondary)", borderColor: "var(--color-border-subtle)" }}>
+                        style={{ color: "var(--color-text-secondary)", borderColor: "var(--color-border-subtle)" }}>
                       Applied AI Optimizations
                     </h3>
                     {savingsSuggestions.filter((s) => s.applied).length === 0 ? (
@@ -1253,10 +1253,10 @@ export default function App() {
                     ) : (
                       savingsSuggestions.filter((s) => s.applied).map((s, idx) => (
                         <div key={idx} className="flex justify-between items-center text-xs p-3.5 rounded-xl"
-                          style={{
-                            backgroundColor: "var(--color-bg-subtle)",
-                            border: "1px solid var(--color-border-medium)",
-                          }}>
+                             style={{
+                               backgroundColor: "var(--color-bg-subtle)",
+                               border: "1px solid var(--color-border-medium)",
+                             }}>
                           <div>
                             <span className="font-semibold block text-[11px]" style={{ color: "var(--color-text-primary)" }}>
                               {s.billName}
@@ -1276,13 +1276,13 @@ export default function App() {
                   {/* Transaction log */}
                   <div className="space-y-3">
                     <h3 className="text-xs font-bold uppercase tracking-widest border-b pb-1.5"
-                      style={{ color: "var(--color-text-secondary)", borderColor: "var(--color-border-subtle)" }}>
+                        style={{ color: "var(--color-text-secondary)", borderColor: "var(--color-border-subtle)" }}>
                       Transaction Records
                     </h3>
                     <table className="w-full text-xs font-sans">
                       <thead>
                         <tr className="text-[10px] font-semibold uppercase text-left"
-                          style={{ color: "var(--color-text-muted)" }}>
+                            style={{ color: "var(--color-text-muted)" }}>
                           <th className="pb-2">Date</th>
                           <th className="pb-2">Merchant</th>
                           <th className="pb-2">Category</th>
@@ -1296,7 +1296,7 @@ export default function App() {
                             <td className="py-2 font-semibold" style={{ color: "var(--color-text-primary)" }}>{tx.merchant}</td>
                             <td className="py-2 text-[10px]" style={{ color: "var(--color-text-muted)" }}>{tx.category}</td>
                             <td className="py-2 text-right font-mono font-semibold"
-                              style={{ color: tx.amount < 0 ? "#f43f5e" : "#10b981" }}>
+                                style={{ color: tx.amount < 0 ? "#f43f5e" : "#10b981" }}>
                               {tx.amount < 0 ? "-" : "+"}${Math.abs(tx.amount).toFixed(2)}
                             </td>
                           </tr>
@@ -1334,9 +1334,9 @@ export default function App() {
                   { href: `mailto:${socialLinks.contactEmail}`, icon: Mail, title: "Email" },
                 ].filter(({ href }) => href).map(({ href, icon: Icon, title }) => (
                   <a key={title} href={href} target={href?.startsWith("mailto") ? undefined : "_blank"}
-                    rel="noopener noreferrer"
-                    className="p-2 rounded-xl transition-all text-slate-400 hover:text-indigo-400"
-                    style={{ backgroundColor: "#1e293b" }} title={title}>
+                     rel="noopener noreferrer"
+                     className="p-2 rounded-xl transition-all text-slate-400 hover:text-indigo-400"
+                     style={{ backgroundColor: "#1e293b" }} title={title}>
                     <Icon className="w-3.5 h-3.5" />
                   </a>
                 ))}
@@ -1352,25 +1352,25 @@ export default function App() {
       {/* ── ONBOARDING TUTORIAL MODAL ── */}
       {showTutorial && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ backgroundColor: "rgba(0,0,0,0.60)", backdropFilter: "blur(4px)" }}>
+             style={{ backgroundColor: "rgba(0,0,0,0.60)", backdropFilter: "blur(4px)" }}>
           <div className="rounded-3xl max-w-sm w-full p-6 relative flex flex-col"
-            style={{
-              backgroundColor: "var(--color-bg-elevated)",
-              border: "1px solid var(--color-border-medium)",
-              boxShadow: "var(--shadow-xl)",
-            }}>
+               style={{
+                 backgroundColor: "var(--color-bg-elevated)",
+                 border: "1px solid var(--color-border-medium)",
+                 boxShadow: "var(--shadow-xl)",
+               }}>
             <div className="flex justify-between items-center mb-5 pb-3 border-b"
-              style={{ borderColor: "var(--color-border-subtle)" }}>
+                 style={{ borderColor: "var(--color-border-subtle)" }}>
               <span className="text-[10px] font-bold uppercase py-1 px-2.5 rounded-full tracking-wider"
-                style={{
-                  backgroundColor: "var(--color-brand-50)",
-                  color: "var(--color-brand-600)",
-                }}>
+                    style={{
+                      backgroundColor: "var(--color-brand-50)",
+                      color: "var(--color-brand-600)",
+                    }}>
                 Step {tutorialStep} of 4
               </span>
               <button onClick={() => setShowTutorial(false)}
-                className="p-1 rounded-lg cursor-pointer"
-                style={{ color: "var(--color-text-muted)" }}>
+                      className="p-1 rounded-lg cursor-pointer"
+                      style={{ color: "var(--color-text-muted)" }}>
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -1378,7 +1378,7 @@ export default function App() {
             {tutorialStep === 1 && (
               <div className="space-y-3.5">
                 <div className="h-12 w-12 rounded-2xl flex items-center justify-center mb-2"
-                  style={{ backgroundColor: "var(--color-brand-50)" }}>
+                     style={{ backgroundColor: "var(--color-brand-50)" }}>
                   <Sparkles className="w-6 h-6 animate-pulse" style={{ color: "var(--color-brand-600)" }} />
                 </div>
                 <h3 className="text-sm font-bold font-display" style={{ color: "var(--color-text-primary)" }}>
@@ -1393,7 +1393,7 @@ export default function App() {
             {tutorialStep === 2 && (
               <div className="space-y-3.5">
                 <div className="h-12 w-12 rounded-2xl flex items-center justify-center mb-2"
-                  style={{ backgroundColor: "var(--color-success-bg)" }}>
+                     style={{ backgroundColor: "var(--color-success-bg)" }}>
                   <DollarSign className="w-6 h-6" style={{ color: "var(--color-success-icon)" }} />
                 </div>
                 <h3 className="text-sm font-bold font-display" style={{ color: "var(--color-text-primary)" }}>
@@ -1404,9 +1404,9 @@ export default function App() {
                 </p>
                 <div className="pt-2">
                   <label className="text-[9px] font-bold uppercase tracking-wider block mb-1"
-                    style={{ color: "var(--color-text-muted)" }}>Monthly income ($)</label>
+                         style={{ color: "var(--color-text-muted)" }}>Monthly income ($)</label>
                   <input type="number" value={income || ""} onChange={(e) => setIncome(Math.max(0, parseFloat(e.target.value) || 0))}
-                    placeholder="e.g. 4500" className="brutal-input text-xs" autoFocus />
+                         placeholder="e.g. 4500" className="brutal-input text-xs" autoFocus />
                 </div>
               </div>
             )}
@@ -1414,7 +1414,7 @@ export default function App() {
             {tutorialStep === 3 && (
               <div className="space-y-3.5">
                 <div className="h-12 w-12 rounded-2xl flex items-center justify-center mb-2"
-                  style={{ backgroundColor: "var(--color-brand-50)" }}>
+                     style={{ backgroundColor: "var(--color-brand-50)" }}>
                   <CreditCard className="w-6 h-6" style={{ color: "var(--color-brand-600)" }} />
                 </div>
                 <h3 className="text-sm font-bold font-display" style={{ color: "var(--color-text-primary)" }}>
@@ -1429,7 +1429,7 @@ export default function App() {
             {tutorialStep === 4 && (
               <div className="space-y-3.5">
                 <div className="h-12 w-12 rounded-2xl flex items-center justify-center mb-2"
-                  style={{ backgroundColor: "var(--color-warning-bg)" }}>
+                     style={{ backgroundColor: "var(--color-warning-bg)" }}>
                   <Receipt className="w-6 h-6" style={{ color: "var(--color-warning-icon)" }} />
                 </div>
                 <h3 className="text-sm font-bold font-display" style={{ color: "var(--color-text-primary)" }}>
@@ -1445,19 +1445,19 @@ export default function App() {
             <div className="mt-8 flex gap-3 pt-4 border-t" style={{ borderColor: "var(--color-border-subtle)" }}>
               {tutorialStep > 1 && (
                 <button onClick={() => setTutorialStep((p) => p - 1)}
-                  className="flex-1 font-bold text-[11px] py-2.5 rounded-2xl cursor-pointer transition-colors"
-                  style={{
-                    backgroundColor: "var(--color-bg-subtle)",
-                    color: "var(--color-text-secondary)",
-                    border: "1px solid var(--color-border-medium)",
-                  }}>
+                        className="flex-1 font-bold text-[11px] py-2.5 rounded-2xl cursor-pointer transition-colors"
+                        style={{
+                          backgroundColor: "var(--color-bg-subtle)",
+                          color: "var(--color-text-secondary)",
+                          border: "1px solid var(--color-border-medium)",
+                        }}>
                   Back
                 </button>
               )}
               {tutorialStep < 4 ? (
                 <button onClick={() => setTutorialStep((p) => p + 1)}
-                  className="flex-1 text-white font-bold text-[11px] py-2.5 rounded-2xl cursor-pointer transition-colors"
-                  style={{ backgroundColor: "var(--color-brand-600)" }}>
+                        className="flex-1 text-white font-bold text-[11px] py-2.5 rounded-2xl cursor-pointer transition-colors"
+                        style={{ backgroundColor: "var(--color-brand-600)" }}>
                   Next
                 </button>
               ) : (
@@ -1467,8 +1467,8 @@ export default function App() {
                   localStorage.setItem(completedKey, "true");
                   await saveOverallSettings(income);
                 }}
-                  className="flex-1 text-white font-bold text-[11px] py-2.5 rounded-2xl cursor-pointer transition-colors"
-                  style={{ backgroundColor: "#16a34a" }}>
+                        className="flex-1 text-white font-bold text-[11px] py-2.5 rounded-2xl cursor-pointer transition-colors"
+                        style={{ backgroundColor: "#16a34a" }}>
                   Let's Go!
                 </button>
               )}
@@ -1480,16 +1480,16 @@ export default function App() {
       {/* ── LOGOUT CONFIRM MODAL ── */}
       {showLogoutConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ backgroundColor: "rgba(0,0,0,0.60)", backdropFilter: "blur(4px)" }}>
+             style={{ backgroundColor: "rgba(0,0,0,0.60)", backdropFilter: "blur(4px)" }}>
           <div className="rounded-3xl max-w-sm w-full p-6 relative flex flex-col"
-            style={{
-              backgroundColor: "var(--color-bg-elevated)",
-              border: "1px solid var(--color-border-medium)",
-              boxShadow: "var(--shadow-xl)",
-            }}>
+               style={{
+                 backgroundColor: "var(--color-bg-elevated)",
+                 border: "1px solid var(--color-border-medium)",
+                 boxShadow: "var(--shadow-xl)",
+               }}>
             <div className="space-y-4 mb-6">
               <div className="h-12 w-12 rounded-2xl flex items-center justify-center"
-                style={{ backgroundColor: "var(--color-brand-50)" }}>
+                   style={{ backgroundColor: "var(--color-brand-50)" }}>
                 <Cloud className="w-5 h-5 animate-pulse" style={{ color: "var(--color-brand-500)" }} />
               </div>
               <h3 className="text-sm font-bold font-display" style={{ color: "var(--color-text-primary)" }}>
@@ -1500,18 +1500,18 @@ export default function App() {
               </p>
               <div className="space-y-2 font-mono text-[10px]" style={{ color: "var(--color-text-muted)" }}>
                 <div className="p-3 rounded-2xl flex items-center gap-2"
-                  style={{
-                    backgroundColor: "var(--color-bg-subtle)",
-                    border: "1px solid var(--color-border-subtle)",
-                  }}>
+                     style={{
+                       backgroundColor: "var(--color-bg-subtle)",
+                       border: "1px solid var(--color-border-subtle)",
+                     }}>
                   <div className={`h-2 w-2 rounded-full ${unsavedChanges ? "bg-amber-500 animate-pulse" : "bg-green-500"}`}></div>
                   <span>Income: ${income.toFixed(2)}</span>
                 </div>
                 <div className="p-3 rounded-2xl flex items-center gap-2"
-                  style={{
-                    backgroundColor: "var(--color-bg-subtle)",
-                    border: "1px solid var(--color-border-subtle)",
-                  }}>
+                     style={{
+                       backgroundColor: "var(--color-bg-subtle)",
+                       border: "1px solid var(--color-border-subtle)",
+                     }}>
                   <FileText className="w-3.5 h-3.5" style={{ color: "var(--color-brand-500)" }} />
                   <span>Transactions: {transactions.length} | Bills: {bills.length}</span>
                 </div>
@@ -1526,23 +1526,23 @@ export default function App() {
                 setShowLogoutConfirm(false);
                 signOut();
               }}
-                className="w-full text-white font-bold text-xs py-3 rounded-2xl cursor-pointer transition-colors flex items-center justify-center gap-2"
-                style={{ backgroundColor: "var(--color-brand-600)" }}>
+                      className="w-full text-white font-bold text-xs py-3 rounded-2xl cursor-pointer transition-colors flex items-center justify-center gap-2"
+                      style={{ backgroundColor: "var(--color-brand-600)" }}>
                 <Cloud className="w-4 h-4" />
                 Sync & Sign Out
               </button>
               <button onClick={() => { setShowLogoutConfirm(false); signOut(); }}
-                className="w-full font-bold text-xs py-2.5 rounded-2xl cursor-pointer transition-colors"
-                style={{
-                  backgroundColor: "var(--color-bg-subtle)",
-                  color: "var(--color-text-secondary)",
-                  border: "1px solid var(--color-border-medium)",
-                }}>
+                      className="w-full font-bold text-xs py-2.5 rounded-2xl cursor-pointer transition-colors"
+                      style={{
+                        backgroundColor: "var(--color-bg-subtle)",
+                        color: "var(--color-text-secondary)",
+                        border: "1px solid var(--color-border-medium)",
+                      }}>
                 Sign Out Without Saving
               </button>
               <button onClick={() => setShowLogoutConfirm(false)}
-                className="w-full font-semibold text-xs py-2 rounded-2xl cursor-pointer transition-colors"
-                style={{ color: "var(--color-text-muted)" }}>
+                      className="w-full font-semibold text-xs py-2 rounded-2xl cursor-pointer transition-colors"
+                      style={{ color: "var(--color-text-muted)" }}>
                 Cancel
               </button>
             </div>
